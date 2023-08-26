@@ -1,0 +1,27 @@
+repoServer:
+  extraContainers:
+    - name: plugin
+      image: xlp67/helmfile-argocd:v1.0.0
+      command: ["/var/run/argocd/argocd-cmp-server"]
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+      envFrom:
+        - secretRef:
+            name: argocd-aws-credentials
+      env:
+        - name: ENV_NAME
+          value: dev
+        - name: ARGOCD_ENV_ENV_NAME
+          value: dev
+      volumeMounts:
+        - mountPath: /var/run/argocd
+          name: var-files
+        - mountPath: /home/argocd/cmp-server/plugins
+          name: plugins
+  serviceAccount:
+    create: true
+    name: "argocd-repo-server"
+    annotations: {}
+    labels: {}
+    automountServiceAccountToken: true
